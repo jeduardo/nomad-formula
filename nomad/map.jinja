@@ -1,12 +1,30 @@
 # -*- coding: utf-8 -*-
 # vim: ft=jinja
 
-{## Start with  defaults from defaults.sls ##}
+{## Start with defaults from defaults.sls ##}
 {% import_yaml 'nomad/defaults.yaml' as default_settings %}
 
 {##
-Setup variable using grains['os_family'] based logic, only add key:values here
-that differ from whats in defaults.yaml
+Add any overrides based on CPU architecture.
+##}
+{% set cpu_arch_map = salt['grains.filter_by']({
+        'armv6l': {
+            "arch": 'arm'
+        },
+        'armv7l': {
+            "arch": 'arm'
+        },
+        'x86_64': {
+            "arch": 'amd64'
+        }
+  }
+  , grain="cpuarch"
+  , merge=salt['pillar.get']('nomad'))
+%}
+{% do default_settings.nomad.update(cpu_arch_map) %}
+
+{##
+Add any overrides based on operating system.
 ##}
 {% set os_family_map = salt['grains.filter_by']({
         'Debian': {
@@ -18,12 +36,11 @@ that differ from whats in defaults.yaml
         'RedHat': {},
   }
   , grain="os_family"
-  , merge=salt['pillar.get']('nomad:lookup'))
+  , merge=salt['pillar.get']('nomad'))
 %}
-{## Merge the flavor_map to the default settings ##}
 {% do default_settings.nomad.update(os_family_map) %}
 
-{## Merge in nomad:lookup pillar ##}
+{## Merge in nomad:* pillar ##}
 {% set nomad = salt['pillar.get'](
         'nomad',
         default=default_settings.nomad,

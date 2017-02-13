@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: ft=sls
 
-{% from "nomad/map.jinja" import nomad with context %}
+{%- from "nomad/map.jinja" import nomad with context %}
 
 nomad-config:
   file.managed:
@@ -11,13 +11,15 @@ nomad-config:
     - user: root
     - group: root
     - template: jinja
-    {% if nomad.service != False %}
+    {%- if nomad.service != False %}
     - watch_in:
-       - service: nomad
-    {% endif %}
+       - service: nomad-service
+    {%- endif %}
 
 # Enabling the service here to ensure each state is independent.
 nomad-service:
   service.running:
     - name: nomad
+    # Restart service if config changes
+    - restart: True
     - enable: {{ nomad.service }}

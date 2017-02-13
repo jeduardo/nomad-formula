@@ -18,6 +18,7 @@ nomad-data-dir:
     - name: {{ nomad.config.data_dir }}
     - makedirs: True
 
+{% if nomad.build %}
 nomad-prepare-build:
   file.directory:
     - name: /tmp/nomad-v{{ nomad.version }}/go/src/github.com/hashicorp
@@ -70,7 +71,16 @@ nomad-install-binary:
     - source: /tmp/nomad-v{{ nomad.version }}/go/bin/nomad
     - force: True
     - require:
+      - service: nomad-install-binary
       - nomad-bin-dir
+    - onchanges:
+      - nomad-build
+  cmd.run:
+    - name: '/usr/bin/strip {{ nomad.bin_dir }}/nomad'
+    - onchanges:
+      - file: nomad-install-binary
+  service.dead:
+    - name: nomad
     - onchanges:
       - nomad-build
 
@@ -80,12 +90,10 @@ nomad-install-service:
     - source: /tmp/nomad-v{{ nomad.version }}/go/src/github.com/hashicorp/nomad/dist/systemd/nomad.service
     - onchanges:
       - nomad-build
-   cmd.wait:
-    - name: 'systemctl daemon-reload'
-    - require:
-      - file: nomad-install-service
+   module.run:
+    - name: service.systemctl_reload
     - onchanges:
-      - nomad-build
+      - file: nomad-install-service
 
 nomad-cleanup-build:
   file.absent:
@@ -95,3 +103,38 @@ nomad-cleanup-build:
       - nomad-install-service
     - onchanges:
       - nomad-build
+
+{% else %} 
+nomad-install-binary:
+  archive.extracted:
+    - name: {{ nomad.bin_dir }}
+    - source: https://releases.hashicorp.com/nomad/{{ nomad.version }}/nomad_{{ nomad.version }}_{{ grains['kernel'] | lower }}_{{ nomad.arch }}.zip
+    - source_hash: https://releases.hashicorp.com/nomad/{{ nomad.version }}/nomad_{{ nomad.version }}_SHA256SUMS
+    # If we don't force it here, the mere presence of an older version will prevent an upgrade.
+    - overwrite: True 
+    # Hashicorp gives a zip with a single binary. Salt doesn't like that.
+    - enforce_toplevel: False
+    - require:
+      - service: nomad-install-binary
+    - unless:
+      - '{{ nomad.bin_dir }}/nomad -v && {{ nomad.bin_dir }}/nomad -v | grep {{ nomad.version }}'
+  service.dead:
+    - name: nomad
+    - unless:
+      - '{{ nomad.bin_dir }}/nomad -v && {{ nomad.bin_dir }}/nomad -v | grep {{ nomad.version }}'
+
+nomad-install-service:
+  file.managed:
+    - name: /etc/systemd/system/nomad.service
+    - source: https://raw.githubusercontent.com/hashicorp/nomad/v{{ nomad.version }}/dist/systemd/nomad.service
+    - source_hash: {{ nomad.service_hash }}
+    - onchanges:
+      - nomad-install-binary
+  module.run:
+    - name: service.systemctl_reload
+    - onchanges:
+      - file: nomad-install-service
+{% endif %}
+
+
+

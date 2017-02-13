@@ -5,13 +5,10 @@ nomad-formula
 A saltstack formula created to setup `Hashicorp's Nomad
 <https://www.nomadproject.io>`_ on a single machine or in a machine cluster.
 
-.. note::
+.. notes::
 
-    This formula was primarily tested on Raspbian deployments.
-    It also requires golang to be installed in all target machines, as it builds
-    Nomad from source.
-    Finally, Nomad must run as root for it to be able to use all execution
-    drivers.
+    It is mandatory to have Go installed on a machine that will build Nomad.
+    Nomad must run as root for it to be able to use all execution drivers.
 
 
 Available states
