@@ -29,7 +29,8 @@ Add any overrides based on operating system.
 {% set os_family_map = salt['grains.filter_by']({
         'Debian': {
             "git_pkg": 'git',
-            "make_pkg": 'make'
+            "make_pkg": 'make',
+            "gcc_pkg": 'gcc'
         },
         'Suse': {},
         'Arch': {},

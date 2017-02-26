@@ -1,0 +1,5 @@
+.cache/*
+.kitchen/*
+vendor/*
+*.xml
+*.pyc

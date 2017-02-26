@@ -10,6 +10,9 @@ A saltstack formula created to setup `Hashicorp's Nomad
     It is mandatory to have Go installed on a machine that will build Nomad.
     Nomad must run as root for it to be able to use all execution drivers.
 
+.. image:: https://travis-ci.org/saltstack-formulas/nomad-formula.svg?branch=master
+    :target: https://travis-ci.org/saltstack-formulas/nomad-formula
+
 
 Available states
 ================
@@ -43,6 +46,7 @@ This state can be called independently.
 ``uninstall``
 -------------
 
-Remove the service, binaries, data, and configuration files.
+Remove the service, binaries, and configuration files. The data itself will be kept and needs
+to be removed manually, just to be on the safe side.
 
 This is state must always be called independently.

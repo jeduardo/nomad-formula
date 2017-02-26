@@ -1,6 +1,14 @@
 Nomad formula
 =============
 
+0.0.3 (2017-02-26)
+
+- Added gcc dependency to build Nomad from source.
+- Added integration tests with Test Kitchen, testinfra, and Travis CI.
+- Added golang-formula as test dependency.
+- Fixed binary ownership when installed from binary to match installed from source.
+- Fixed documentation regarding data removal during uninstallation.
+
 0.0.2 (2017-02-13)
 
 - Support for installing from official binaries on amd64 and arm platforms.

@@ -32,6 +32,7 @@ nomad-check-build-packages:
     - names:
       - {{ nomad.git_pkg }}
       - {{ nomad.make_pkg }}
+      - {{ nomad.gcc_pkg }}
     - onlyif:
       - 'command -v go'
     - onchanges:
@@ -118,6 +119,13 @@ nomad-install-binary:
       - service: nomad-install-binary
     - unless:
       - '{{ nomad.bin_dir }}/nomad -v && {{ nomad.bin_dir }}/nomad -v | grep {{ nomad.version }}'
+  file.managed:
+    - name: {{ nomad.bin_dir }}/nomad
+    - user: root
+    - group: root
+    - mode: 0755
+    - require:
+      - archive: nomad-install-binary
   service.dead:
     - name: nomad
     - unless:
