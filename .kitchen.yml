@@ -34,27 +34,28 @@ platforms:
 
 suites:
   - name: nomad-install
-  - name: nomad-install_build
-    provisioner:
-      state_top:
-        base:
-          '*':
-            - golang
-            - nomad
-      pillars:
-        top.sls:
-          base:
-            '*':
-              - golang
-              - nomad
-              - nomad-build
-        nomad-build.sls:
-            nomad:
-              build: true
-        golang.sls:
-            golang:
-              lookup:
-                version: 1.7.5
+  # This one should be tested locally as it times out on Travis CI
+  # - name: nomad-install_build
+  #   provisioner:
+  #     state_top:
+  #       base:
+  #         '*':
+  #           - golang
+  #           - nomad
+  #     pillars:
+  #       top.sls:
+  #         base:
+  #           '*':
+  #             - golang
+  #             - nomad
+  #             - nomad-build
+  #       nomad-build.sls:
+  #           nomad:
+  #             build: true
+  #       golang.sls:
+  #           golang:
+  #             lookup:
+  #               version: 1.7.5
   - name: nomad-config
   - name: nomad-uninstall
     provisioner:

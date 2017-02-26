@@ -12,5 +12,5 @@ before_install:
   # Installing testinfra and requirements
   - pip install -r requirements.txt
 
-script: travis_wait bundle exec kitchen verify
+script: bundle exec kitchen verify
 
